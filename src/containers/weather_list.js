@@ -7,25 +7,45 @@ import GoogleMap from '../components/google_map';
 class WeatherList extends Component {
 
   renderWeather(cityData) {
-    const name = cityData.city.name;
-    const temps = cityData.list.map(weather => {
+    
+    const weatherObj = {
+      name: cityData.city.name,
+      temps: [],
+      humidities: [],
+      pressures: [],
+      coords: {
+        lon: cityData.city.coord.lon,
+        lat: cityData.city.coord.lat
+      }
+    }
+
+    cityData.list.map(weather => {
+      weatherObj.temps.push(Math.floor(weather.main.temp * 9/5 -459.67 + 0.5));
+      weatherObj.humidities.push(weather.main.humidity);
+      weatherObj.pressures.push(weather.main.pressure);
+    });
+
+    /* const temps = cityData.list.map(weather => {
       return Math.floor(weather.main.temp * 9/5 -459.67 + 0.5)}); 
       // convert Kelvin to Farenheit and add 0.5 so floor rounds properly
     const pressures = cityData.list.map(weather => weather.main.pressure);
-    const humidities = cityData.list.map(weather => weather.main.humidity);
-    const { lon, lat } = cityData.city.coord;
+    const humidities = cityData.list.map(weather => weather.main.humidity); 
+    const { lon, lat } = cityData.city.coord;*/
+    const condition = cityData.list.map(weather => weather.weather[0].description);
+    
+    console.log(weatherObj);
 
     return (
-      <tr key={name}>
-        <td><GoogleMap lat={lat} lon={lon} /></td>
+      <tr key={weatherObj.name}>
+        <td><GoogleMap lat={weatherObj.coords.lat} lon={weatherObj.coords.lon} /></td>
         <td>
-          <Chart data={temps} color="orange" />
+          <Chart data={weatherObj.temps} color="orange" />
         </td>
         <td>
-          <Chart data={pressures} color="red" />
+          <Chart data={weatherObj.pressures} color="red" />
         </td>
         <td>
-          <Chart data={humidities} color="blue" />
+          <Chart data={weatherObj.humidities} color="blue" />
         </td>
       </tr>
     );
